@@ -7,14 +7,16 @@ Run `bitwarden-menu` from the command line, or set a keybind to run it for you.
 ## Installation
 
 `git clone https://github.com/Pomegranate123/bitwarden-menu.git`
-`cd bitwarden-menu`
-`cargo install --path .`
 
+`cd bitwarden-menu`
+
+`cargo install --path .`
 
 ## Feature roadmap
 - [x] List logins
 - [x] Copy to clipboard
 - [x] Fetch icons for logins
+- [ ] Password caching
 - [ ] Sync ability
 - [ ] Editing logins
 - [ ] Adding logins
