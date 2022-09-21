@@ -5,11 +5,8 @@ Yet another bitwarden menu, made using rust & rofi.
 Run `bitwarden-menu` from the command line, or set a keybind to run it for you.
 
 ## Installation
-Run the following commands:
 ```
-git clone https://github.com/Pomegranate123/bitwarden-menu.git
-cd bitwarden-menu
-cargo install --path .
+$ cargo install --git https://github.com/Pomegranate123/bitwarden-menu.git
 ```
 
 ## Feature roadmap

@@ -3,6 +3,7 @@
 use crate::utils::{Login, Session};
 use copypasta_ext::prelude::*;
 use copypasta_ext::x11_bin::ClipboardContext;
+use notify_rust::Notification;
 use std::env;
 use std::path::Path;
 
@@ -38,8 +39,17 @@ fn main() {
             &format!("{}/bw-rofi/rofi.txt", cache_path),
         ],
     );
+    if index.is_empty() {
+        std::process::exit(0);
+    }
 
     let id = ids.get(index.parse::<usize>().unwrap()).unwrap();
     let login = session.get_login(id);
     ctx.set_contents(login.password).unwrap();
+    Notification::new()
+        .summary(&login.name)
+        .body("Password copied to clipboard")
+        .icon(&format!("file://{}/bw-rofi/images/{}.png", cache_path, id))
+        .show()
+        .unwrap();
 }
