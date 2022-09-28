@@ -34,6 +34,7 @@ fn main() {
             "Bitwarden:",
             "-format",
             "i",
+            "-i",
             "-markup-rows",
             "-input",
             &format!("{}/bitwarden-menu/rofi.txt", cache_path),
