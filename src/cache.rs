@@ -6,9 +6,9 @@ use std::path::Path;
 
 pub fn read_ids() -> Option<Vec<String>> {
     let cache_path = env::var("XDG_CACHE_HOME").unwrap();
-    if Path::new(&format!("{}/bw-rofi/cache.txt", cache_path)).exists() {
+    if Path::new(&format!("{}/bitwarden-menu/cache.txt", cache_path)).exists() {
         let cache: Vec<String> = serde_json::from_str(
-            &fs::read_to_string(format!("{}/bw-rofi/cache.txt", cache_path))
+            &fs::read_to_string(format!("{}/bitwarden-menu/cache.txt", cache_path))
                 .expect("Unable to read file"),
         )
         .unwrap();
@@ -20,16 +20,16 @@ pub fn read_ids() -> Option<Vec<String>> {
 
 pub fn write(logins: &[Login]) {
     let cache_path = std::env::var("XDG_CACHE_HOME").unwrap();
-    fs::create_dir_all(format!("{}/bw-rofi/images", cache_path)).unwrap();
+    fs::create_dir_all(format!("{}/bitwarden-menu/images", cache_path)).unwrap();
 
-    let mut rofi_cache = fs::File::create(format!("{}/bw-rofi/rofi.txt", cache_path)).unwrap();
+    let mut rofi_cache = fs::File::create(format!("{}/bitwarden-menu/rofi.txt", cache_path)).unwrap();
     for login in logins {
         cache_image(login);
         write!(
             rofi_cache,
             "{}",
             format!(
-                "{}\n<i>{}</i>\0icon\x1f{}/bw-rofi/images/{}.png\x0f",
+                "{}\n<i>{}</i>\0icon\x1f{}/bitwarden-menu/images/{}.png\x0f",
                 login.name, login.username, cache_path, login.id
             )
             .replace('&', "&amp;")
@@ -37,7 +37,7 @@ pub fn write(logins: &[Login]) {
         .unwrap();
     }
 
-    let mut buffer = fs::File::create(format!("{}/bw-rofi/cache.txt", cache_path)).unwrap();
+    let mut buffer = fs::File::create(format!("{}/bitwarden-menu/cache.txt", cache_path)).unwrap();
     let ids: Vec<String> = logins.iter().map(|login| login.id.clone()).collect();
     let serialized = serde_json::to_string(&ids).unwrap();
     write!(buffer, "{}", serialized).unwrap();
@@ -46,14 +46,14 @@ pub fn write(logins: &[Login]) {
 fn cache_image(login: &Login) {
     let cache_path = env::var("XDG_CACHE_HOME").unwrap();
     let data_path = env::var("XDG_DATA_HOME").unwrap();
-    if Path::new(&format!("{}/bw-rofi/images/{}.png", cache_path, login.id)).exists() {
+    if Path::new(&format!("{}/bitwarden-menu/images/{}.png", cache_path, login.id)).exists() {
         return;
     }
     match &login.uri {
         Some(website) => {
             let website = website.trim_start_matches("https://");
             let mut file =
-                fs::File::create(format!("{}/bw-rofi/images/{}.png", cache_path, login.id))
+                fs::File::create(format!("{}/bitwarden-menu/images/{}.png", cache_path, login.id))
                     .unwrap();
             let request_url = format!(
                 "https://s2.googleusercontent.com/s2/favicons?domain_url=https://{}&sz=96",
@@ -65,8 +65,8 @@ fn cache_image(login: &Login) {
                 .unwrap();
         }
         None => std::os::unix::fs::symlink(
-            format!("{}/bw-rofi/default.png", data_path),
-            format!("{}/bw-rofi/images/{}.png", cache_path, login.id),
+            format!("{}/bitwarden-menu/default.png", data_path),
+            format!("{}/bitwarden-menu/images/{}.png", cache_path, login.id),
         )
         .unwrap(),
     }

@@ -16,8 +16,8 @@ fn main() {
     let mut session = Session::new();
     let mut ctx = ClipboardContext::new().unwrap();
 
-    if !Path::new(&format!("{}/bw-rofi/rofi.txt", cache_path)).exists()
-        || !Path::new(&format!("{}/bw-rofi/cache.txt", cache_path)).exists()
+    if !Path::new(&format!("{}/bitwarden-menu/rofi.txt", cache_path)).exists()
+        || !Path::new(&format!("{}/bitwarden-menu/cache.txt", cache_path)).exists()
     {
         cache::write(&session.get_logins());
     }
@@ -36,7 +36,7 @@ fn main() {
             "i",
             "-markup-rows",
             "-input",
-            &format!("{}/bw-rofi/rofi.txt", cache_path),
+            &format!("{}/bitwarden-menu/rofi.txt", cache_path),
         ],
     );
     if index.is_empty() {
@@ -49,7 +49,7 @@ fn main() {
     Notification::new()
         .summary(&login.name)
         .body("Password copied to clipboard")
-        .icon(&format!("file://{}/bw-rofi/images/{}.png", cache_path, id))
+        .icon(&format!("file://{}/bitwarden-menu/images/{}.png", cache_path, id))
         .show()
         .unwrap();
 }
