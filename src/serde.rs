@@ -4,11 +4,17 @@ use serde::Deserialize;
 impl From<BwObject> for Login {
     fn from(obj: BwObject) -> Login {
         Login {
-            password: obj.password(),
-            username: obj.username(),
-            uri: obj.uri(),
-            name: obj.name,
             id: obj.id,
+            name: obj.name,
+            notes: obj.notes,
+            username: obj.login.as_ref().and_then(|login| login.username.clone()),
+            password: obj.login.as_ref().and_then(|login| login.password.clone()),
+            fields: obj.fields,
+            uri: obj.login.and_then(|l| {
+                l.uris
+                    .first()
+                    .map(|uri| uri.uri.clone().unwrap_or_default())
+            }),
         }
     }
 }
@@ -20,9 +26,9 @@ struct BwObject {
     pub login: Option<BwLogin>,
     //#[serde(rename = "type")]
     //pub kind: usize,
-    //pub notes: Option<String>,
-    //#[serde(default)]
-    //pub fields: Vec<Field>,
+    pub notes: Option<String>,
+    #[serde(default)]
+    pub fields: Vec<Field>,
     //pub favorite: bool,
 }
 
@@ -43,39 +49,10 @@ struct Uri {
     //pub kind: Option<usize>,
 }
 
-//#[derive(Deserialize)]
-//struct Field {
-//    pub name: String,
-//    pub value: String,
-//}
-
-impl BwObject {
-    pub fn username(&self) -> String {
-        if let Some(login) = &self.login {
-            if let Some(username) = &login.username {
-                return username.to_string();
-            }
-        }
-        String::new()
-    }
-
-    pub fn password(&self) -> String {
-        if let Some(login) = &self.login {
-            if let Some(password) = &login.password {
-                return password.to_string();
-            }
-        }
-        String::new()
-    }
-
-    pub fn uri(&self) -> Option<String> {
-        if let Some(login) = &self.login {
-            if let Some(uri) = login.uris.first() {
-                return uri.uri.clone();
-            }
-        }
-        None
-    }
+#[derive(Deserialize)]
+pub struct Field {
+    pub name: String,
+    pub value: String,
 }
 
 pub fn parse_logins(json: String) -> Vec<Login> {

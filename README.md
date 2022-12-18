@@ -13,9 +13,12 @@ $ cargo install --git https://github.com/Pomegranate123/bitwarden-menu.git
 - [x] List logins
 - [x] Copy to clipboard
 - [x] Fetch icons for logins
+- [x] Notification when copied
+- [x] Show login details
 - [ ] Password caching
 - [ ] Sync ability
 - [ ] Editing logins
 - [ ] Adding logins
 - [ ] Removing logins
 - [ ] Autofill
+- [ ] Show favorite logins first
