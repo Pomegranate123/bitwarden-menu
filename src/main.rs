@@ -28,7 +28,7 @@ fn main() {
 
     loop {
         let output = Command::new("rofi")
-            .args(&[
+            .args([
                 "-dmenu",       // Launch in dmenu mode
                 "-sep",         // Set the seperator between entries to
                 "\x0f",         // \x0f to allow for \n
@@ -75,7 +75,7 @@ fn main() {
                             .unwrap();
                         return;
                     }
-                    None => utils::show_error(&format!(
+                    None => utils::show_error(format!(
                         "Login entry '{}' does not have a password.",
                         login.name
                     )),
@@ -88,7 +88,7 @@ fn main() {
                 let id = ids.get(index).unwrap();
                 let login = session.get_login(id);
                 let mut rofi = Command::new("rofi")
-                    .args(&[
+                    .args([
                         "-dmenu",       // Launch in dmenu mode
                         "-sep",         // Set the seperator between entries to
                         "\x0f",         // \x0f to allow for \n
