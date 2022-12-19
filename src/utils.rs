@@ -54,78 +54,17 @@ impl Login {
     }
 }
 
-#[derive(Default)]
-pub struct Session(Option<String>);
-
-impl Session {
-    pub fn new() -> Self {
-        Session(None)
-    }
-
-    pub fn get_logins(&mut self) -> Vec<Login> {
-        //let bw_session = env::var("BW_SESSION").unwrap();
-        //println!("id: '{}'", bw_session);
-        let output = run_command("bw", &["list", "items", "--nointeraction"]);
-        serde::parse_logins(parse_output(output.stdout))
-    }
-
-    pub fn get_login(&mut self, login_id: &str) -> Login {
-        //let bw_session = env::var("BW_SESSION").unwrap();
-        //println!("id: '{}'", bw_session);
-        let output = run_command("bw", &["get", "item", login_id, "--nointeraction"]);
-        serde::parse_login(parse_output(output.stdout))
-    }
-}
-
-fn unlock_vault(err: &Option<String>) {
-    println!("{}", err.as_ref().unwrap_or(&String::new()));
-    let mut args = vec!["-dmenu", "-l", "0", "-password", "-p", "Password:"];
-    if let Some(e) = err {
-        args.extend(&["-mesg", e]);
-    }
-    let output = run_command("rofi", &args);
-    if let Some(1) = output.status.code() {
-        std::process::exit(0);
-    }
-    let password = parse_output(output.stdout);
-    let output = run_command("bw", &["--raw", "unlock", &password, "--nointeraction"]);
-    if let Some(0) = output.status.code() {
-        let session_id = parse_output(output.stdout);
-        env::set_var("BW_SESSION", &session_id);
-        println!("Set BW_SESSION to: '{}'", &session_id);
-    }
-}
-
-pub fn run_command_old(cmd: &str) -> Result<String, String> {
-    let mut args = cmd.split_whitespace();
-    let output = Command::new(args.next().expect("Unable to execute empty command"))
-        .args(args.collect::<Vec<&str>>())
-        .output()
-        .unwrap_or_else(|_| panic!("Failed to execute process: '{}'", cmd));
-    let stderr = parse_output(output.stderr);
-    if !stderr.is_empty() {
-        Err(stderr)
-    } else {
-        Ok(parse_output(output.stdout))
-    }
-}
-
 pub fn run_command(cmd: &str, args: &[&str]) -> Output {
     let output = Command::new(cmd)
         .args(args)
         .output()
         .unwrap_or_else(|_| panic!("Failed to execute process: '{}'", cmd));
-    if output.status.code() == Some(1) && cmd == "bw" {
-        let stderr = parse_output(output.stderr);
-        let err = match stderr.is_empty() {
-            true => None,
-            false => Some(stderr),
-        };
-        unlock_vault(&err);
-        run_command(cmd, args)
-    } else {
-        output
+    let err = parse_output(output.stderr.clone());
+    if !err.is_empty() {
+        let args: String = args.join(" ");
+        eprintln!("Error: {} {}\n{}", cmd, args, err);
     }
+    output
 }
 
 pub fn parse_output(output: Vec<u8>) -> String {

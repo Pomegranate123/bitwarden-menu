@@ -1,6 +1,7 @@
 #![feature(result_option_inspect)]
 
-use crate::utils::{Login, Session};
+use crate::utils::Login;
+use crate::vault::Vault;
 use copypasta_ext::prelude::*;
 use copypasta_ext::x11_bin::ClipboardContext;
 use notify_rust::Notification;
@@ -10,17 +11,19 @@ use std::process::{Command, Stdio};
 
 pub mod cache;
 pub mod serde;
+pub mod session;
 pub mod utils;
+pub mod vault;
 
 fn main() {
-    let mut session = Session::new();
+    let mut vault = Vault::default();
     let mut ctx = ClipboardContext::new().unwrap();
 
     if !Path::new(&format!("{}/bitwarden-menu/rofi", *utils::CACHE_PATH)).exists()
         || !Path::new(&format!("{}/bitwarden-menu/cache", *utils::CACHE_PATH)).exists()
         || !Path::new(&format!("{}/bitwarden-menu/images/", *utils::CACHE_PATH)).exists()
     {
-        cache::write(&session.get_logins());
+        cache::write(&vault.get_logins());
     }
 
     let ids = cache::read_ids().unwrap();
@@ -59,7 +62,7 @@ fn main() {
                 // Copy password
                 index = stdout.parse::<usize>().unwrap();
                 let id = ids.get(index).unwrap();
-                let login = session.get_login(id);
+                let login = vault.get_login(id);
                 match login.password {
                     Some(password) => {
                         ctx.set_contents(password).unwrap();
@@ -86,7 +89,7 @@ fn main() {
                 // Show login
                 index = stdout.parse::<usize>().unwrap();
                 let id = ids.get(index).unwrap();
-                let login = session.get_login(id);
+                let login = vault.get_login(id);
                 let mut rofi = Command::new("rofi")
                     .args([
                         "-dmenu",       // Launch in dmenu mode
