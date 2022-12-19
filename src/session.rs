@@ -13,7 +13,7 @@ impl Session {
             .unwrap_or_else(|_| panic!("Failed to execute process: 'bw'"));
         let err = parse_output(output.stderr.clone());
         match err.as_str() {
-            "mac failed." => {
+            "mac failed.\nVault is locked." => {
                 self.refresh(false);
                 self.run_bw(args);
             }
